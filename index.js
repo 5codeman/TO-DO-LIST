@@ -6,6 +6,7 @@ var todoInput = document.getElementById("todo-input")
 var deleteAllButton = document.getElementById("delete-all")
 var allTodos = document.getElementById("all-todos");
 var deleteSButton = document.getElementById("delete-selected")
+let CurrentSelectedItem;
 
 
 //event listners for add and delete
@@ -14,13 +15,16 @@ deleteAllButton.addEventListener("click", deleteAll)
 deleteSButton.addEventListener("click", deleteS)
 
 
-//event listeners for filtersk
+//event listeners for filters
 document.addEventListener('click', (e) => {
     if (e.target.className.split(' ')[0] == 'complete' || e.target.className.split(' ')[0] == 'ci') {
         completeTodo(e);
     }
     if (e.target.className.split(' ')[0] == 'delete' || e.target.className.split(' ')[0] == 'di') {
-        deleteTodo(e)
+        deleteTodo(e);
+    }
+    if (e.target.className.split(' ')[0] === 'edit' || e.target.className.split(' ')[0] === 'ed') {
+        editEntry(e);
     }
     if (e.target.id == "all") {
         viewAll();
@@ -33,6 +37,7 @@ document.addEventListener('click', (e) => {
     }
 
 })
+
 //event listner for enter key
 todoInput.addEventListener('keypress', (e) => {
     if (e.key === 'Enter') {
@@ -40,6 +45,56 @@ todoInput.addEventListener('keypress', (e) => {
     }
 });
 
+// Edition functionality provider fucntions
+function editEntry(entry) {
+    const listItem = entry.target.closest('li');
+    const itemId = listItem.getAttribute('id');
+
+    CurrentSelectedItem = todoList.find(e => e.id == itemId);
+
+    const taskTitle = CurrentSelectedItem.task;
+    openEditModal(taskTitle);
+}
+
+function openEditModal(taskTitle) {
+    const editModal = document.getElementById('editModal');
+    const overlay = document.getElementById('overlay');
+    const oldTitle = document.getElementById('oldTitle');
+    
+    // Set the current task title in the input field
+    oldTitle.innerText += taskTitle;
+
+    // Display the modal and overlay
+    editModal.style.display = 'block';
+    overlay.style.display = 'block';
+}
+
+function closeEditModal() {
+    const editModal = document.getElementById('editModal');
+    const overlay = document.getElementById('overlay');
+    const oldTitle = document.getElementById('oldTitle');
+    const editTaskInput = document.getElementById('editTaskInput');
+
+    // Reset the text of oldTitle label and editTaskInput textbox
+    oldTitle.innerText = "Old: ";
+    editTaskInput.value = "";
+
+    // Hide the modal and overlay
+    editModal.style.display = 'none';
+    overlay.style.display = 'none';
+
+    addinmain(todoList);
+}
+
+function updateTaskTitle() {
+    const editTaskInput = document.getElementById('editTaskInput');
+    const taskTitle = editTaskInput.value;
+
+    CurrentSelectedItem.task = taskTitle;
+
+    // Close the edit modal
+    closeEditModal();
+}
 
 //updates the all the remaining, completed and main list
 function update() {
@@ -81,17 +136,21 @@ function addinmain(todoList) {
     allTodos.innerHTML = ""
     todoList.forEach(element => {
         var x = `<li id=${element.id} class="todo-item">
-    <p id="task"> ${element.complete ? `<strike>${element.task}</strike>` : element.task} </p>
-    <div class="todo-actions">
-                <button class="complete btn btn-success">
-                    <i class=" ci bx bx-check bx-sm"></i>
-                </button>
+                    <p id="task"> ${element.complete ? `<strike>${element.task}</strike>` : element.task} </p>
+                    <div class="todo-actions">
+                        <button class="complete btn btn-success">
+                            <i class=" ci bx bx-check bx-sm"></i>
+                        </button>
 
-                <button class="delete btn btn-error" >
-                    <i class="di bx bx-trash bx-sm"></i>
-                </button>
-            </div>
-        </li>`
+                        <button class="edit btn btn-edit">
+                            <i class="ed bx bx-edit bx-sm"></i>
+                        </button>
+
+                        <button class="delete btn btn-error" >
+                            <i class="di bx bx-trash bx-sm"></i>
+                        </button>
+                    </div>
+                </li>`
         allTodos.innerHTML += x
     });
 }
@@ -163,6 +222,7 @@ function viewRemaining() {
 
     addinmain(remList);
 }
+
 function viewAll() {
     addinmain(todoList);
 }

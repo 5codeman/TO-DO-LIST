@@ -49,6 +49,16 @@
 
         </ul>
 
+        <!--this is a dynamic pop-up dialog box for editing an item title-->
+        <div id="overlay" class="overlay" onclick="closeEditModal()"></div>
+        <div class="modal container" id="editModal">
+            <label id="oldTitle">Old: </label><br>
+            <label for="editTaskInput">New:</label>
+            <input type="text" id="editTaskInput" class="input">
+            <button onclick="updateTaskTitle()" class="btn">OK</button>
+            <button onclick="closeEditModal()" class="btn">Cancel</button>
+        </div>
+
 
         <!-- dropdown throgh which we can apply filters -->
         <div class="filters">
